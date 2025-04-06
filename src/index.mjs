@@ -52,26 +52,30 @@ export class World {
   }
 
   householdHasEletricity(household) {
-  const visited = new Set();
+  
+  if(!household) return false;
 
-  const queue = [household];
-
-  while (queue.length > 0) {
-    const current = queue.shift();
-    if (visited.has(current)) continue;
-    visited.add(current);
-
-    for (let powerPlant of current.connectedPowerPlants) {
-      if (powerPlant.alive) {
-        return true;
-      }
-    }
-    for (let neighbor of current.connectedHouseholds) {
-      if (!visited.has(neighbor)) {
-        queue.push(neighbor);
-      }
-    }
+  return this.#householdHasEletricity(household);
+  
   }
-  return false;
+
+  #householdHasEletricity(household, visited = new Set()) {
+
+        if (visited.has(household)) return false;
+        visited.add(household);
+
+    for (let powerPlant of household.connectedPowerPlants) {
+          if (powerPlant.alive) {
+            return true;
+          }
+        }
+
+        if(household.connectedHouseholds.size === 0) return false;
+
+        for (let neighbor of household.connectedHouseholds) {
+           if(this.#householdHasEletricity(neighbor,visited)) return true;
+      }
+    
+      return false;
   }
 }
